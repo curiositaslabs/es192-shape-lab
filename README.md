@@ -20,7 +20,7 @@ Each tab has a microscope strip (grains and atoms) that follows the load: elasti
 
 ## Using it in class
 
-- **Play** (▶ or Space) ramps the load; **New specimen** (N) resets a broken part.
+- **Play** (▶ or Space) ramps the load; pressing it again after a full run starts on a fresh specimen. **New specimen** (N) puts a fresh part in the machine and sets the load back to zero. The page opens unloaded.
 - **Strain colours** (S) colour the part, and the atoms in the microscope, from blue (low) to red (failure).
 - **Labels** (L) show forces, supports and section sizes; they are off by default.
 - `1`–`5` switch tabs, `P` toggles Present mode (full screen), `R` resets the view, `E` opens the Experiments. **Sources** lists every equation with its Ashby 6e number and page.

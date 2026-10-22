@@ -24,7 +24,9 @@ function renderChart(){if(!RIG[cur].S)return;const Rg=RIG[cur],fn=chartKind==='t
   if(!$('stagechart').hidden){$('sc-title').textContent=t;fn.call(Rg,$('sc-svg'),$('sc-leg'));}}
 function refresh(){RIG[cur].update();renderMicro();renderChart();}
 function clearHist(Rg){for(const k of Object.keys(Rg))if(/^hist/.test(k)&&Array.isArray(Rg[k]))Rg[k]=Rg[k].map(()=>0);}
-function newSpecimen(){clearHist(RIG[cur]);refresh();MIC.snap();}
+/* a new specimen goes into an unloaded machine: zero the load first, otherwise a fresh part placed
+   under a load above its collapse load breaks again on the same frame and the reset looks like it did nothing */
+function newSpecimen(){stopPlay();const s=$(PLAYS[cur]);if(s)s.value=s.min;clearHist(RIG[cur]);refresh();MIC.snap();}
 
 function show(id){stopPlay();cur=id;microPick=null;tabBtns.forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
   document.querySelectorAll('[data-panel]').forEach(el=>el.hidden=el.dataset.panel!==id);
@@ -76,7 +78,7 @@ let play=null;
 const PLAYS={column:'c-F',wall:'w-F',cells:'m-P',lattice:'l-P',sheet:'s-P'};
 function setPlayIcons(){document.querySelectorAll('.play').forEach(b=>{const on=play&&play.id===b.dataset.for;b.textContent=on?'❚❚':'▶';b.setAttribute('aria-label',on?'Pause load':'Play load');});}
 function stopPlay(){if(play){play=null;setPlayIcons();}}
-function startPlay(id){const s=$(id),mn=+s.min,mx=+s.max;let v=+s.value;if(v>=mx-1e-9)v=mn;s.value=v;play={id,t0:performance.now(),v0:v,mn,mx};setPlayIcons();}
+function startPlay(id){const s=$(id),mn=+s.min,mx=+s.max;let v=+s.value;if(v>=mx-1e-9){v=mn;clearHist(RIG[cur]);}/* replaying a finished test starts on a new specimen */s.value=v;play={id,t0:performance.now(),v0:v,mn,mx};setPlayIcons();}
 function togglePlay(){const id=PLAYS[cur];if(play&&play.id===id)stopPlay();else startPlay(id);}
 document.querySelectorAll('.play').forEach(b=>b.addEventListener('click',()=>{if(play&&play.id===b.dataset.for)stopPlay();else startPlay(b.dataset.for);}));
 function stepPlay(now){if(!play)return;const s=$(play.id),dur=7000*(play.mx-play.v0)/(play.mx-play.mn||1);const f=Math.min(1,(now-play.t0)/Math.max(500,dur));
